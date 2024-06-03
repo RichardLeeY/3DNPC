@@ -1,0 +1,329 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  chat-app
+
+  Sample SAM Template for chat-app
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  
+        
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'my-website-bucket-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - "*"
+            ExposedHeaders:
+              - ETag
+            MaxAge: 3000
+
+  
+  # CloudFront Origin Access Identity
+  WebsiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: OAC for my website bucket
+        Name: my-website-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # CloudFront Distribution
+  WebsiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          ViewerProtocolPolicy: redirect-to-https
+          TargetOriginId: WebsiteOrigin
+          ForwardedValues:
+            QueryString: false
+            Headers:
+              - Origin
+              - Access-Control-Request-Headers
+              - Access-Control-Request-Method
+          AllowedMethods:
+            - GET
+            - HEAD
+          DefaultTTL: 0
+          MinTTL: 0
+          MaxTTL: 0
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        Origins:
+          - Id: WebsiteOrigin
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            OriginAccessControlId: !Ref WebsiteOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              "Service": "cloudfront.amazonaws.com"
+            Action: s3:GetObject
+            Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}'
+
+  GameMetadataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: GameMetadata
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gameid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gameid
+          KeyType: HASH
+  FFmpegLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ffmpeg-layer
+      Description: FFmpeg layer for Lambda
+      ContentUri: ./assets/ffmpeg.zip
+      CompatibleRuntimes:
+        - python3.9
+
+  Wav2lipFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: wav2lipFunc/ 
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref LayerBoto3 
+      Timeout: 300
+      Architectures:
+      - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: VisualEditor2
+              Effect: Allow
+              Action:
+                - 's3:PutObject'
+                - 's3:GetObject'
+              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+            - Sid: VisualEditor3
+              Effect: Allow
+              Action:
+                - 'sqs:ReceiveMessage'
+                - 'sqs:DeleteMessage'
+                - 'sqs:GetQueueAttributes'
+              Resource: 'arn:aws:sqs:us-east-1:845524701534:wav2lipTask'
+            - Sid: VisualEditor4
+              Effect: Allow
+              Action:
+                - 'ssm:SendCommand'
+              Resource: 
+                - 'arn:aws:ec2:us-east-1:845524701534:instance/*'
+                - 'arn:aws:ssm:us-east-1::document/AWS-RunShellScript'
+  Wav2Mp3Function:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: wav2mp3Func/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref LayerBoto3
+        - !Ref FFmpegLayer
+      Timeout: 300    
+      Architectures:
+      - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: VisualEditor2
+              Effect: Allow
+              Action:
+                - 's3:PutObject'
+                - 's3:GetObject'
+              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+  TtsAsyncFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ttsAsync/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref LayerBoto3
+        - !Ref LayerScipy
+      Timeout: 300    
+      Architectures:
+      - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: InvokeSagemakerModel
+              Effect: Allow
+              Action:
+                - 'sagemaker:InvokeEndpoint'
+              Resource: '*'
+            - Sid: VisualEditor2
+              Effect: Allow
+              Action:
+                - 's3:PutObject'
+                - 's3:GetObject'
+              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+  ChatFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: chat/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref LayerBoto3
+        - !Ref LayerScipy
+      Timeout: 30    
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          ttsFunction: !GetAtt TtsAsyncFunction.Arn
+          BUCKET_NAME: !Ref WebsiteBucket
+          DOMAIN_NAME: !GetAtt WebsiteDistribution.DomainName
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: InvokeModel
+              Effect: Allow
+              Action:
+                - 'bedrock:InvokeModelWithResponseStream'
+                - 'bedrock:InvokeModel'
+              Resource: 'arn:aws:bedrock:*::foundation-model/*'
+            - Sid: InvokeSagemakerModel
+              Effect: Allow
+              Action:
+                - 'sagemaker:InvokeEndpoint'
+              Resource: '*'
+            - Sid: ListFM
+              Effect: Allow
+              Action:
+                - 'bedrock:ListFoundationModels'   
+              Resource: '*'
+            - Sid: GetTable
+              Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:Scan
+                - dynamodb:UpdateItem
+              Resource:
+                - !GetAtt GameMetadataTable.Arn
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: VisualEditor0
+              Effect: Allow
+              Action: 'lambda:InvokeFunction'
+              Resource: 'arn:aws:lambda:us-east-1:*:function:*'
+            - Sid: VisualEditor1
+              Effect: Allow
+              Action: 'polly:SynthesizeSpeech'
+              Resource: '*'
+            - Sid: VisualEditor2
+              Effect: Allow
+              Action:
+                - 's3:PutObject'
+                - 's3:GetObject'
+                - 's3:GetBucketCors'
+              Resource:
+                - !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+                - !Sub 'arn:aws:s3:::${WebsiteBucket}'
+
+  
+  # ChatFunctionDestination:
+  #   Type: AWS::Lambda::EventInvokeConfig
+  #   Properties:
+  #     FunctionName: !Ref ChatFunction
+  #     Qualifier: $LATEST  # or an alias/version
+  #     DestinationConfig:
+  #       OnSuccess:
+  #         Destination: !GetAtt TtsAsyncFunction.Arn
+  #       OnFailure:
+  #         Destination: !GetAtt TtsAsyncFunction.Arn
+    
+
+  
+  LayerBoto3:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+        ContentUri: ./layers/boto3-layer/
+        CompatibleRuntimes:
+          - python3.9
+      Metadata:
+        BuildMethod: python3.9 
+
+  LayerScipy:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ./layers/scipy-layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9   
+  
+      
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+
+  ChatFunction:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt ChatFunction.Arn
+  ChatFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt ChatFunctionRole.Arn
