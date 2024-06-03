@@ -1,0 +1,89 @@
+body {
+  margin: 0px !important;
+}
+
+
+
+/* 当屏幕宽度小于 450px 时应用的样式 */
+@media (max-width: 749px) {
+  .demo-logo {
+    width: 200px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .list-content {
+    top: 220px;
+  }
+  .chat-component {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+  }
+
+  .chat-input{
+    min-width: 120px !important;
+  }
+}
+
+/* 当屏幕宽度大于等于 450px 时应用的样式 */
+@media (min-width: 750px) {
+  .demo-logo {
+    width: 400px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .list-content {
+    top: 300px;
+    width: 1057px;
+  }
+  .chat-component {
+    position: fixed;
+    left: 160px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.npc-card {
+  transition: all 0.3s ease-in-out; /* 添加过渡效果 */
+  /* box-shadow: 0 0 40px 40px rgba(255, 255, 255, 0.5);  */
+  /* 鼠标悬停时的白色阴影 */
+
+}
+
+.npc-card:hover {
+  box-shadow: 0 0 6px 6px rgba(255, 255, 255, 0.5); /* 鼠标悬停时的白色阴影 */
+  transform: scale(1.05);
+  transition: all 0.3s ease-in-out; /* 添加过渡效果 */
+}
+
+.card-show {
+  width: 240px;
+  height: 300px;
+}
+
+.user-msg {
+  background-color: "#DCF8C6";
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  max-width: 60%;
+  align-self: "flex-end";
+}
+
+.robot-msg {
+  background-color: "#DCF8C6";
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  max-width: 60%;
+  align-self: "flex-end";
+}
+
+.msg-list::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
