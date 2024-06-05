@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   chat-app
@@ -12,12 +12,10 @@ Globals:
     MemorySize: 256
 
 Resources:
-  
-        
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'my-website-bucket-${AWS::AccountId}'
+      BucketName: !Sub "my-website-bucket-${AWS::AccountId}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -39,7 +37,6 @@ Resources:
               - ETag
             MaxAge: 3000
 
-  
   # CloudFront Origin Access Identity
   WebsiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
@@ -84,7 +81,7 @@ Resources:
             OriginAccessControlId: !Ref WebsiteOAC
             S3OriginConfig:
               OriginAccessIdentity: ""
-            
+
   WebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -95,10 +92,10 @@ Resources:
             Principal:
               "Service": "cloudfront.amazonaws.com"
             Action: s3:GetObject
-            Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+            Resource: !Sub "arn:aws:s3:::${WebsiteBucket}/*"
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}'
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}"
 
   GameMetadataTable:
     Type: AWS::DynamoDB::Table
@@ -120,41 +117,6 @@ Resources:
       CompatibleRuntimes:
         - python3.9
 
-  Wav2lipFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: wav2lipFunc/ 
-      Handler: app.lambda_handler
-      Runtime: python3.9
-      Layers:
-        - !Ref LayerBoto3 
-      Timeout: 300
-      Architectures:
-      - x86_64
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: '2012-10-17'
-          Statement:
-            - Sid: VisualEditor2
-              Effect: Allow
-              Action:
-                - 's3:PutObject'
-                - 's3:GetObject'
-              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
-            - Sid: VisualEditor3
-              Effect: Allow
-              Action:
-                - 'sqs:ReceiveMessage'
-                - 'sqs:DeleteMessage'
-                - 'sqs:GetQueueAttributes'
-              Resource: 'arn:aws:sqs:us-east-1:845524701534:wav2lipTask'
-            - Sid: VisualEditor4
-              Effect: Allow
-              Action:
-                - 'ssm:SendCommand'
-              Resource: 
-                - 'arn:aws:ec2:us-east-1:845524701534:instance/*'
-                - 'arn:aws:ssm:us-east-1::document/AWS-RunShellScript'
   Wav2Mp3Function:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -164,19 +126,19 @@ Resources:
       Layers:
         - !Ref LayerBoto3
         - !Ref FFmpegLayer
-      Timeout: 300    
+      Timeout: 300
       Architectures:
-      - x86_64
+        - x86_64
       Policies:
         - AWSLambdaBasicExecutionRole
-        - Version: '2012-10-17'
+        - Version: "2012-10-17"
           Statement:
             - Sid: VisualEditor2
               Effect: Allow
               Action:
-                - 's3:PutObject'
-                - 's3:GetObject'
-              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+                - "s3:PutObject"
+                - "s3:GetObject"
+              Resource: !Sub "arn:aws:s3:::${WebsiteBucket}/*"
   TtsAsyncFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -186,24 +148,60 @@ Resources:
       Layers:
         - !Ref LayerBoto3
         - !Ref LayerScipy
-      Timeout: 300    
+      Timeout: 300
       Architectures:
-      - x86_64
+        - x86_64
       Policies:
         - AWSLambdaBasicExecutionRole
-        - Version: '2012-10-17'
+        - Version: "2012-10-17"
           Statement:
             - Sid: InvokeSagemakerModel
               Effect: Allow
               Action:
-                - 'sagemaker:InvokeEndpoint'
-              Resource: '*'
+                - "sagemaker:InvokeEndpoint"
+              Resource: "*"
             - Sid: VisualEditor2
               Effect: Allow
               Action:
-                - 's3:PutObject'
-                - 's3:GetObject'
-              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+                - "s3:PutObject"
+                - "s3:GetObject"
+              Resource: !Sub "arn:aws:s3:::${WebsiteBucket}/*"
+  ApiGatewayRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: chat
+      StageName: prod
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref ApiGatewayRestApi
+          StageName: !Ref ApiGatewayRestApi.Stage
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ApiGatewayRestApi
+          Stage: !Ref ApiGatewayRestApi.Stage
+      Quota:
+        Limit: 1000
+        Period: DAY
+      Throttle:
+        BurstLimit: 100
+        RateLimit: 50
+      UsagePlanName: ChatUsagePlan
+
+  UsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+
   ChatFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -213,34 +211,60 @@ Resources:
       Layers:
         - !Ref LayerBoto3
         - !Ref LayerScipy
-      Timeout: 30    
+      Timeout: 30
       Architectures:
-      - x86_64
+        - x86_64
       Environment:
         Variables:
           ttsFunction: !GetAtt TtsAsyncFunction.Arn
           BUCKET_NAME: !Ref WebsiteBucket
           DOMAIN_NAME: !GetAtt WebsiteDistribution.DomainName
+      Events:
+        InferenceEvent:
+          Type: Api
+          Properties:
+            Path: /inference
+            Method: POST
+            RestApiId: !Ref ApiGatewayRestApi
+        WisperEvent:
+          Type: Api
+          Properties:
+            Path: /wisper
+            Method: POST
+            RestApiId: !Ref ApiGatewayRestApi
+        GetGameEvent:
+          Type: Api
+          Properties:
+            Path: /games/{gameid}
+            Method: GET
+            RestApiId: !Ref ApiGatewayRestApi
+        UpdateGameEvent:
+          Type: Api
+          Properties:
+            Path: /games/{gameid}
+            Method: PUT
+            RestApiId: !Ref ApiGatewayRestApi
+
       Policies:
         - AWSLambdaBasicExecutionRole
-        - Version: '2012-10-17'
+        - Version: "2012-10-17"
           Statement:
             - Sid: InvokeModel
               Effect: Allow
               Action:
-                - 'bedrock:InvokeModelWithResponseStream'
-                - 'bedrock:InvokeModel'
-              Resource: 'arn:aws:bedrock:*::foundation-model/*'
+                - "bedrock:InvokeModelWithResponseStream"
+                - "bedrock:InvokeModel"
+              Resource: "arn:aws:bedrock:*::foundation-model/*"
             - Sid: InvokeSagemakerModel
               Effect: Allow
               Action:
-                - 'sagemaker:InvokeEndpoint'
-              Resource: '*'
+                - "sagemaker:InvokeEndpoint"
+              Resource: "*"
             - Sid: ListFM
               Effect: Allow
               Action:
-                - 'bedrock:ListFoundationModels'   
-              Resource: '*'
+                - "bedrock:ListFoundationModels"
+              Resource: "*"
             - Sid: GetTable
               Effect: Allow
               Action:
@@ -249,27 +273,26 @@ Resources:
                 - dynamodb:UpdateItem
               Resource:
                 - !GetAtt GameMetadataTable.Arn
-        - Version: '2012-10-17'
+        - Version: "2012-10-17"
           Statement:
             - Sid: VisualEditor0
               Effect: Allow
-              Action: 'lambda:InvokeFunction'
-              Resource: 'arn:aws:lambda:us-east-1:*:function:*'
+              Action: "lambda:InvokeFunction"
+              Resource: "arn:aws:lambda:us-east-1:*:function:*"
             - Sid: VisualEditor1
               Effect: Allow
-              Action: 'polly:SynthesizeSpeech'
-              Resource: '*'
+              Action: "polly:SynthesizeSpeech"
+              Resource: "*"
             - Sid: VisualEditor2
               Effect: Allow
               Action:
-                - 's3:PutObject'
-                - 's3:GetObject'
-                - 's3:GetBucketCors'
+                - "s3:PutObject"
+                - "s3:GetObject"
+                - "s3:GetBucketCors"
               Resource:
-                - !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
-                - !Sub 'arn:aws:s3:::${WebsiteBucket}'
+                - !Sub "arn:aws:s3:::${WebsiteBucket}/*"
+                - !Sub "arn:aws:s3:::${WebsiteBucket}"
 
-  
   # ChatFunctionDestination:
   #   Type: AWS::Lambda::EventInvokeConfig
   #   Properties:
@@ -280,17 +303,15 @@ Resources:
   #         Destination: !GetAtt TtsAsyncFunction.Arn
   #       OnFailure:
   #         Destination: !GetAtt TtsAsyncFunction.Arn
-    
 
-  
   LayerBoto3:
-      Type: AWS::Serverless::LayerVersion
-      Properties:
-        ContentUri: ./layers/boto3-layer/
-        CompatibleRuntimes:
-          - python3.9
-      Metadata:
-        BuildMethod: python3.9 
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ./layers/boto3-layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
 
   LayerScipy:
     Type: AWS::Serverless::LayerVersion
@@ -299,9 +320,7 @@ Resources:
       CompatibleRuntimes:
         - python3.9
     Metadata:
-      BuildMethod: python3.9   
-  
-      
+      BuildMethod: python3.9
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -315,7 +334,7 @@ Resources:
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      AutoConfigurationEnabled: "true"
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -327,3 +346,6 @@ Outputs:
   ChatFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
     Value: !GetAtt ChatFunctionRole.Arn
+  ApiKey:
+    Description: API Key for Usage Plan
+    Value: !Ref ApiKey
