@@ -40,12 +40,32 @@ Before running the application, ensure that you have the following prerequisites
 ```
 git clone https://github.com/RichardLeeY/3DNPC.git
 ```
+### Back-end
 2. Deploy backend serverless rest api
 ```
 cd chat-app
 sam sync --watch --stack-name chat-app
 ```
 In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab.
+
+### Front-end
+3. Edit the front-end .env file, set the "random authentication key" and  backend serverless rest api host/key in the .env file.
+```
+cd front-end
+vim .env
+```
+NEXT_PUBLIC_API_KEY="random authentication key"
+API_KEY="random authentication key"
+
+4. Deploy front-end service
+```
+cd front-end
+npm install # install dependencies
+npm run build
+npm run dev # local debug
+npm run start # start service in current command line
+sudo pm2 start npm -- start # start service by pm2
+```
 
 
 ## Acknowledgments
@@ -56,3 +76,51 @@ This project was made possible with the help of the following AWS services:
 - Amazon SageMaker Endpoint
 - Amazon Lambda
 - Amazon API Gateway
+- Amazon EC2
+
+## Dependencies
+
+### Front-end
+- Next.js（https://github.com/vercel/next.js）
+- ant-design（https://github.com/ant-design/ant-design）
+- Three.js（https://threejs.org/）
+
+### Back-end
+
+
+## Contents
+
+```
+├── chat-app  // back-end 
+│   ├── assets
+│   ├── chat
+│   │   └── prompts
+│   ├── events
+│   ├── layers
+│   │   ├── boto3-layer
+│   │   ├── sagemaker-layer
+│   │   └── scipy-layer
+│   ├── tests
+│   │   ├── integration
+│   │   └── unit
+│   ├── ttsAsync
+│   └── wav2mp3Func
+├── front-end  // front-end
+│   ├── app    // Pages
+│   │   ├── chat-page
+│   │   └── npc-list
+│   ├── components  // UI Components
+│   │   ├── animation-skinning-morph
+│   │   ├── chat-component
+│   │   ├── dream-girl
+│   │   ├── mum
+│   │   └── richard
+│   ├── pages  // Nextjs API（Backend-for-Frontend）
+│   │   └── api
+│   ├── public  // images & glb file
+│   │   └── models
+│   ├── service  // Backend-for-Frontend to back-end 
+│   ├── tempAudio  // Temp audio data
+│   └── tools
+└── images   // Readme images
+```
