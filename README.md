@@ -81,9 +81,9 @@ This project was made possible with the help of the following AWS services:
 ## Dependencies
 
 ### Front-end
-- Next.js（https://github.com/vercel/next.js）
-- ant-design（https://github.com/ant-design/ant-design）
-- Three.js（https://threejs.org/）
+- Next.js（ https://github.com/vercel/next.js ）
+- ant-design（ https://github.com/ant-design/ant-design ）
+- Three.js（ https://threejs.org/ ）
 
 ### Back-end
 
