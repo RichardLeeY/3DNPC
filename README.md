@@ -17,6 +17,41 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## Project Structure
 
+```
+├── chat-app  // This directory contains the backend code for the application.
+│   ├── assets
+│   ├── chat
+│   │   └── prompts
+│   ├── events
+│   ├── layers
+│   │   ├── boto3-layer
+│   │   ├── sagemaker-layer
+│   │   └── scipy-layer
+│   ├── tests
+│   │   ├── integration
+│   │   └── unit
+│   ├── ttsAsync
+│   └── wav2mp3Func
+├── front-end  // This directory contains the frontend code for the application.
+│   ├── app    // Pages
+│   │   ├── chat-page
+│   │   └── npc-list
+│   ├── components  // UI Components & 
+│   │   ├── animation-skinning-morph
+│   │   ├── chat-component
+│   │   ├── dream-girl
+│   │   ├── mum
+│   │   └── richard
+│   ├── pages  // Nextjs API（Backend-for-Frontend）
+│   │   └── api
+│   ├── public  // images & glb file
+│   │   └── models
+│   ├── service  // Backend-for-Frontend to back-end 
+│   ├── tempAudio  // Temp audio data
+│   └── tools
+└── images   // Readme images
+```
+
 The project is divided into three main directories:
 
 1. /chat-app: This directory contains the backend code for the application.
@@ -49,15 +84,19 @@ sam sync --watch --stack-name chat-app
 In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab.
 
 ### Front-end
-3. Edit the front-end .env file, set the "random authentication key" and  backend serverless rest api host/key in the .env file.
+3. Edit the front-end .env file, set the "random authentication key" and backend serverless rest api host/key in the .env file.
 ```
 cd front-end
 vim .env
 ```
 NEXT_PUBLIC_API_KEY="random authentication key"
 API_KEY="random authentication key"
+API_GATEWAY_URL="backend serverless rest api host"
+API_GATEWAY_KEY="backend serverless rest api key"
 
 4. Deploy front-end service
+
+Maybe you need to install PM2 on your server for process hosting.
 ```
 cd front-end
 npm install # install dependencies
@@ -70,6 +109,7 @@ sudo pm2 start npm -- start # start service by pm2
 
 ## Acknowledgments
 
+### AWS services
 This project was made possible with the help of the following AWS services:
 - Amazon Polly
 - Amazon Bedrock Claude Haiku
@@ -77,6 +117,16 @@ This project was made possible with the help of the following AWS services:
 - Amazon Lambda
 - Amazon API Gateway
 - Amazon EC2
+  
+### UI & Threejs & Audio
+
+The front-end project uses Threejs to render various models. The model files (glb) are in the public folder of the front-end directory. See: https://threejs.org/examples/#webgl_animation_skinning_morph.
+
+All background information/action binding is implemented in the front-end/components/chat-component/index.tsx file.
+
+The recording function uses the browser ```navigator.mediaDevices``` API. This API needs to be accessed on an HTTPS site by default. Otherwise, you need to manually set the security settings of this site. Reference: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+
+Audio playback requires that the S3 storage for audio be allowed to allow CORS. It is recommended to add Cloudfront back to the S3 source.
 
 ## Dependencies
 
@@ -86,41 +136,3 @@ This project was made possible with the help of the following AWS services:
 - Three.js（ https://threejs.org/ ）
 
 ### Back-end
-
-
-## Contents
-
-```
-├── chat-app  // back-end 
-│   ├── assets
-│   ├── chat
-│   │   └── prompts
-│   ├── events
-│   ├── layers
-│   │   ├── boto3-layer
-│   │   ├── sagemaker-layer
-│   │   └── scipy-layer
-│   ├── tests
-│   │   ├── integration
-│   │   └── unit
-│   ├── ttsAsync
-│   └── wav2mp3Func
-├── front-end  // front-end
-│   ├── app    // Pages
-│   │   ├── chat-page
-│   │   └── npc-list
-│   ├── components  // UI Components
-│   │   ├── animation-skinning-morph
-│   │   ├── chat-component
-│   │   ├── dream-girl
-│   │   ├── mum
-│   │   └── richard
-│   ├── pages  // Nextjs API（Backend-for-Frontend）
-│   │   └── api
-│   ├── public  // images & glb file
-│   │   └── models
-│   ├── service  // Backend-for-Frontend to back-end 
-│   ├── tempAudio  // Temp audio data
-│   └── tools
-└── images   // Readme images
-```
