@@ -64,7 +64,7 @@ Before running the application, ensure that you have the following prerequisites
 
 * Python (version 3.9 or higher)
 * AWS CLI (configured with your AWS credentials)
-* Service Application Model(SAM cli)
+* Service Application Model(SAM cli) >= 1.118.0
 
 ## Project Architecture
 
