@@ -36,12 +36,12 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 │   ├── app    // Pages
 │   │   ├── chat-page
 │   │   └── npc-list
-│   ├── components  // UI Components & 
-│   │   ├── animation-skinning-morph
-│   │   ├── chat-component
-│   │   ├── dream-girl
-│   │   ├── mum
-│   │   └── richard
+│   ├── components  // UI Components & Model show
+│   │   ├── animation-skinning-morph  // Robot component
+│   │   ├── chat-component  // Chat input and audio component
+│   │   ├── dream-girl  // Girl component
+│   │   ├── mum   // Mum component
+│   │   └── richard  // IT man component
 │   ├── pages  // Nextjs API（Backend-for-Frontend）
 │   │   └── api
 │   ├── public  // images & glb file
@@ -131,9 +131,52 @@ The front-end project uses Threejs to render various models. The model files (gl
 
 All background information/action binding is implemented in the front-end/components/chat-component/index.tsx file.
 
-The recording function uses the browser ```navigator.mediaDevices``` API. This API needs to be accessed on an HTTPS site by default. Otherwise, you need to manually set the security settings of this site. Reference: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+The recording function uses the browser `navigator.mediaDevices` API. This API needs to be accessed on an HTTPS site by default. Otherwise, you need to manually set the security settings of this site. Reference: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 
-Audio playback requires that the S3 storage for audio be allowed to allow CORS. It is recommended to add Cloudfront back to the S3 source.
+Audio playback requires that the S3 storage for audio be allowed to allow CORS. It is recommended to add Cloudfront back to the S3 source. After configuration, you can use the `<audio src=""/>` tag to play.audio
+
+See: https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html  
+
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html  
+
+#### How to add GLB model in the UI components?
+See `front-end/components/animation-skinning-morph/index.tsx`
+
+```typescript
+// Init model
+const initScene = () => {
+    // ...
+	// Set camera
+    camera = new THREE.PerspectiveCamera(45, hightWidghtSet, 0.25, 100);
+    camera.position.set(-3, 3, 10);
+    camera.lookAt(0, 2, 0);
+    // Set background
+    scene = new THREE.Scene();
+    const textureLoader = new THREE.TextureLoader();
+    const backgroundTexture = textureLoader.load("20240509-162640.jpeg");
+    scene.background = backgroundTexture;
+    // ...
+		// Add glb model
+    const loader = new GLTFLoader();
+    loader.load(
+      "/models/RobotExpressive.glb",
+      (gltf) => {
+        model = gltf.scene;
+        scene.add(model);
+        !isShowList && createGUI(model, gltf.animations);
+      },
+      undefined,
+      (e) => {
+        console.error(e);
+      }
+    );
+		// ...
+  };
+
+	// Create action menu
+  const createGUI = (model: any, animations: string | any[]) => {}
+
+```
 
 ## Dependencies
 
