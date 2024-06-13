@@ -11,6 +11,7 @@ from os import environ
 
 bucket_name = environ.get('BUCKET_NAME')
 domain_name = environ.get('DOMAIN_NAME')
+endpoint = environ.get('ASR_SAGEMAKER_ENDPOINT')
 def lambda_handler(event, context):
     """Sample pure Lambda function
 
@@ -47,7 +48,7 @@ def lambda_handler(event, context):
         }
     if path == '/wisper':
         audio_data_binary = base64.b64decode(event['body'])
-        wisper = apiWisper()
+        wisper = apiWisper(endpoint)
         response = wisper.wisper(audio_data_binary)
         print("response:", response)
         return {

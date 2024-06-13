@@ -83,10 +83,15 @@ git clone https://github.com/RichardLeeY/3DNPC.git
 cd chat-app
 sam sync --watch --stack-name chat-app
 ```
-In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab.
+In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab. Copy the api key value. You will use it in following steps.
+
+3. Prepare generative AI inference endpoint
+    - Deploy open source ASR model Wisper from Sagemaker Studio JumpStart, It will cost about 5-10 minutes to finish deployment. When the SageMaker Endpoint is ready. Open the Lambda Console , find the <font color=#008000>chat-app-ChatFunction-XXX</font>  lambda function and add Environment variables , The key is "ASR_SAGEMAKER_ENDPOINT", The value is the sagemaker endpoint that you get from this step.
+    - (Option) If you want to implement TTS for Chinese Language. Follow step to deploy Bark-small model with Sagemaker notebook instance. It will also cost about 5-10 minutes to finish. When the sagemaker endpoint is ready. Open the lambda Console , find the <font color=#008000>chat-app-TtsAsyncFunction-XXX</font>  lambda function and add Environment variables, The key is "TTS_SAGEMAKER_ENDPOINT". The value is the sagemaker endpoint that you get from this step.
+
 
 ### Front-end
-3. Edit the front-end .env file, set the "random authentication key" and backend serverless rest api host/key in the .env file.
+4. Edit the front-end .env file, set the "random authentication key" and backend serverless rest api host/key in the .env file.
 ```
 cd front-end
 vim .env
@@ -96,7 +101,7 @@ API_KEY="random authentication key"
 API_GATEWAY_URL="backend serverless rest api host"
 API_GATEWAY_KEY="backend serverless rest api key"
 
-4. Deploy front-end service
+5. Deploy front-end service
 
 Maybe you need to install PM2 on your server for process hosting.
 ```

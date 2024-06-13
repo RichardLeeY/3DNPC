@@ -1,8 +1,8 @@
 import boto3
 import json
 class apiWisper:
-    def __init__(self):
-        self.endpoint = "hf-asr-whisper-large-v2-2024-04-18-14-16-25-774"
+    def __init__(self,asr_endpoint):
+        self.endpoint = asr_endpoint
         self.runtime = boto3.Session().client('sagemaker-runtime')
     def wisper(self,wavfile):
         print("begin invoke....")

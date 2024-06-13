@@ -336,16 +336,15 @@ Resources:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: "true"
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-
   ChatFunction:
-    Description: Hello World Lambda Function ARN
+    Description: Chat app Lambda Function ARN
     Value: !GetAtt ChatFunction.Arn
   ChatFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+    Description: Implicit IAM Role created for Chat app function
     Value: !GetAtt ChatFunctionRole.Arn
   ApiKey:
     Description: API Key for Usage Plan
     Value: !Ref ApiKey
+  WebsiteCloudFrontDomain:
+    Description: Cloudfront domain for the website
+    Value: !GetAtt WebsiteDistribution.DomainName

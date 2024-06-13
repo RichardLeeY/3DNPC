@@ -4,7 +4,8 @@ from botocore.config import Config
 import base64
 from scipy.io.wavfile import write as write_wav
 import numpy as np
-endpoint = 'pytorch-inference-2024-04-30-08-34-04-189'
+from os import environ
+endpoint = environ.get('TTS_SAGEMAKER_ENDPOINT')
 s3_client = boto3.client('s3')
 timeout = 300
 
