@@ -4,5 +4,5 @@ Generative AI is developing rapidly, and the corresponding TTS (Text-to-Speech) 
 * Before start, you need to [enable SageMaker Studio in AWS Console](https://sagemaker-examples.readthedocs.io/en/latest/aws_sagemaker_studio/index.html),If you already have SageMaker Studio enabled. Go to next step.
 * Launch your SageMaker Studio. and choose **JumpStart** from left side bar, and find HuggingFace as Provider, Search Models by **Whisper Large V2**, and then click Deploy on the model card.
 <div align="center">
-<img alt="Snapshot" src="../images/sagemaker-whisper-deploy.png" width="600" height="300" />
+<img alt="Snapshot" src="../images/sagemaker-whisper-deploy.png" width="600" height="400" />
 </div>
