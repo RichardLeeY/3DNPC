@@ -70,6 +70,8 @@ Before running the application, ensure that you have the following prerequisites
 
 ![Architecture](./images/HiNPC-ARC.jpg)
 
+![UI-Architecture](./images/front-art.jpg)
+
 ## Usage
 1. Clone the repository:
 ```
