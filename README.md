@@ -188,3 +188,7 @@ const initScene = () => {
 - Three.js（ https://threejs.org/ ）
 
 ### Back-end
+
+//todo
+how to configure s3 bucket??
+how to make s3 trigger to wav2mp3function?
