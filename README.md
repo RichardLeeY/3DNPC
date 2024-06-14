@@ -113,7 +113,9 @@ npm run start # start service in current command line
 sudo pm2 start npm -- start # start service by pm2
 ```
 
-
+## Snapshot
+![](./images/HiNPC.png)
+![](./images/robot.png)
 ## Acknowledgments
 
 ### AWS services
