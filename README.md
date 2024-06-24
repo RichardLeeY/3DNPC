@@ -113,7 +113,9 @@ npm run start # start service in current command line
 sudo pm2 start npm -- start # start service by pm2
 ```
 
-
+## Snapshot
+![](./images/HiNPC.png)
+![](./images/robot.png)
 ## Acknowledgments
 
 ### AWS services
@@ -186,3 +188,7 @@ const initScene = () => {
 - Three.js（ https://threejs.org/ ）
 
 ### Back-end
+
+//todo
+how to configure s3 bucket??
+how to make s3 trigger to wav2mp3function?
