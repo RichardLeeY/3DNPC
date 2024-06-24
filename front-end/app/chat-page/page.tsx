@@ -1,10 +1,6 @@
 "use client";
-import ActionGirl from "@/components/action-girl";
 import AnimationSkinningMorph from "@/components/animation-skinning-morph";
-import ColladaGirl from "@/components/collada-girl";
-import ColladaImperialGuard from "@/components/collada-imperial-guard";
 import DreamGirl from "@/components/dream-girl";
-import HatsuneMiku from "@/components/hatsune-miku";
 import Mum from "@/components/mum";
 import Richard from "@/components/richard";
 import { useSearchParams } from "next/navigation";
