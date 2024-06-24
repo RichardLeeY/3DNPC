@@ -67,8 +67,11 @@ export const wisperGetText = async (data: any) => {
       headers: myHeaders,
       body: data,
     });
-    respone.status !== 502 && console.log("wisperGetText respone", respone);
-    respone.status === 502 && console.log("wisperGetText respone 502");
+    respone.status !== 502 &&
+      respone.status === 500 &&
+      console.log("wisperGetText respone", respone);
+    (respone.status === 502 || respone.status === 500) &&
+      console.log("wisperGetText respone Error", respone);
 
     if (!respone.ok) {
       return { message: "error", text: "error" };
