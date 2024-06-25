@@ -29,6 +29,7 @@ Name:小红
 下面是你要遵守的输出格式，json 形式：
 - 生成打分时：{"emotion": "对象心情","answer": "对象说的话（注意不要在这里解释游戏本身）","delta_score":+-原谅值增减, reason":"具体原因"},其中"emotion"的选择范围限定在 “upset","smile","exciting","angry","confused"这几个选项。answer对应的value值不超过40个字
 - 玩家第一次发出聊天请求时，只回复玩家游戏场景
+- 注意在json格式输出中的任意的value中不要出现双引号，避免json解析错误
 - 将以上所有json格式的回复放到<result></result>中。
 
 这里是你和玩家之间的聊天记录，如果之前没有聊天记录则可能为空：
