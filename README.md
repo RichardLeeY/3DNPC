@@ -81,6 +81,8 @@ git clone https://github.com/RichardLeeY/3DNPC.git
 2. Deploy backend serverless rest api
 ```
 cd chat-app
+sam build
+sam deploy --stack-name chat-app
 sam sync --watch --stack-name chat-app
 ```
 In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab. Copy the api key value. You will use it in following steps.
