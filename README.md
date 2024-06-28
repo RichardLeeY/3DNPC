@@ -88,12 +88,12 @@ sam sync --watch --stack-name chat-app
 In about 5 minutes,when the stack deployment accomplished . You can get API key and API gateway endpoint from the cloudformation stack outputs tab. Copy the api key value. You will use it in following steps.
 
 3. Prepare generative AI inference endpoint
-    - Deploy open source ASR model Wisper from Sagemaker Studio JumpStart, It will cost about 5-10 minutes to finish deployment. When the SageMaker Endpoint is ready. Open the Lambda Console , find the <font color=#008000>chat-app-ChatFunction-XXX</font>  lambda function and add Environment variables , The key is "ASR_SAGEMAKER_ENDPOINT", The value is the sagemaker endpoint that you get from this step.
+    - Deploy open source ASR model Wisper from Sagemaker Studio JumpStart, It will cost about 5-10 minutes to finish deployment. When the SageMaker Endpoint is ready. Open the Lambda Console , find the <font color=#008000>chat-app-ChatFunction-XXX</font>  lambda function and add Environment variables , The key is "ASR_SAGEMAKER_ENDPOINT", The value is the sagemaker endpoint name that you get from this step(e.g. jumpstart-dft-hf-asr-whisper-large-v3).
     - (Option) If you want to implement TTS for Chinese Language. Follow step to deploy Bark-small model with Sagemaker notebook instance. It will also cost about 5-10 minutes to finish. When the sagemaker endpoint is ready. Open the lambda Console , find the <font color=#008000>chat-app-TtsAsyncFunction-XXX</font>  lambda function and add Environment variables, The key is "TTS_SAGEMAKER_ENDPOINT". The value is the sagemaker endpoint that you get from this step.
 4. Change API Setting for Media type "audio/wav",so that the /wisper api can accept audio/wav as payload.
   - Open the AWS Console ,Select API Gateway. choose API "chat",  In the left-hand navigation pane, click on "API Settings".
   ![modify mediatype](./images/api-gateway-mediatype.png)
-  - In the left-hand navigation pane click on "Resources", then Click "Deploy API",Here you can choose "Stage" stage and Deploy.
+  - In the left-hand navigation pane click on "Resources", then Click "Deploy API",Here you can choose "prod" stage and Deploy.
   ![deploy](./images/api-gateway-mediatype.png)
 
 
