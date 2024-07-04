@@ -245,3 +245,4 @@ $RECYCLE.BIN/
 .aws-sam
 *.DS_Store
 temp
+.vscode/
