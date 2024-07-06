@@ -68,9 +68,7 @@ Before running the application, ensure that you have the following prerequisites
 
 ## Project Architecture
 
-![Architecture](./images/HiNPC-ARC.jpg)
-
-![UI-Architecture](./images/front-art.jpg)
+![Architecture](./images/HiNPC-ARC.png)
 
 ## Usage
 1. Clone the repository:
