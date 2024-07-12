@@ -17,6 +17,6 @@ class PromptManager:
         if self.prompt != "":
             return self.prompt
         fileName = "./prompts/"+ self.roleName+"_"+self.language+".txt"
-        promptFile = open(fileName, "r")
-        self.prompt = promptFile.read()
-        return self.prompt
+        with  open(fileName, "r") as promptFile:
+            self.prompt = promptFile.read()
+            return self.prompt

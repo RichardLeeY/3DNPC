@@ -96,7 +96,6 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}"
-
   GameMetadataTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -293,17 +292,7 @@ Resources:
                 - !Sub "arn:aws:s3:::${WebsiteBucket}/*"
                 - !Sub "arn:aws:s3:::${WebsiteBucket}"
 
-  # ChatFunctionDestination:
-  #   Type: AWS::Lambda::EventInvokeConfig
-  #   Properties:
-  #     FunctionName: !Ref ChatFunction
-  #     Qualifier: $LATEST  # or an alias/version
-  #     DestinationConfig:
-  #       OnSuccess:
-  #         Destination: !GetAtt TtsAsyncFunction.Arn
-  #       OnFailure:
-  #         Destination: !GetAtt TtsAsyncFunction.Arn
-
+ 
   LayerBoto3:
     Type: AWS::Serverless::LayerVersion
     Properties:

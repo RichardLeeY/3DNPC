@@ -70,8 +70,8 @@ class RoleConversationBase(ABC):
         resp_body = self.parseResponseBody(resp)
         try:
             resp_body = json.dumps(json.loads(resp_body), ensure_ascii=False)
-        except:
-            pass
+        except :
+            print("json dumps error!")
         print(f"{self.player_name}: {user_input}\n{self.reference_character}:{resp_body}")
         
         return resp_body
