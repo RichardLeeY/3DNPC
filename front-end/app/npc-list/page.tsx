@@ -227,12 +227,12 @@ const NpcList: React.FC = () => {
               },
             },
             background: {
-              color: "#000000",
+              color: "#f0f0f0",
             },
           }}
         />
 
-        <img alt="moon" src="/logo-moon.svg" className="demo-logo" />
+        <img alt="moon" src="/logo-aws.png" className="demo-logo" />
         <Content
           style={{
             padding: "0 6px",
@@ -305,27 +305,6 @@ const NpcList: React.FC = () => {
                     }}
                   >
                     {girlShowTxt}
-                  </span>
-                }
-              />
-            </Card>
-            <Card
-              className="npc-card"
-              hoverable
-              style={{ width: 240 }}
-              cover={<ChatPage isShowList={true} cardType="mum" />}
-              onClick={() => jumpToPage("mum")}
-            >
-              <Meta
-                title="Mum"
-                description={
-                  <span
-                    style={{
-                      color: colorConfig[girlMumColor] || "",
-                      fontSize: "18px",
-                    }}
-                  >
-                    {girlMumTxt}
                   </span>
                 }
               />

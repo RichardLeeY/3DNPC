@@ -40,10 +40,9 @@ const DreamGirl = (props: any) => {
     camera.lookAt(0, 1, 0);
 
     scene = new THREE.Scene();
-    const textureLoader = new THREE.TextureLoader();
-    const backgroundTexture = textureLoader.load("/20240509-161220.jpeg");
 
-    scene.background = backgroundTexture;
+    scene.background = new THREE.Color(0x6a0dad);
+
     scene.fog = new THREE.Fog(0xe0e0e0, 20, 100);
     clock = new THREE.Clock();
     // lights

@@ -7,7 +7,7 @@ body {
 /* 当屏幕宽度小于 450px 时应用的样式 */
 @media (max-width: 749px) {
   .demo-logo {
-    width: 200px;
+    width: 180px;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -30,10 +30,12 @@ body {
 /* 当屏幕宽度大于等于 450px 时应用的样式 */
 @media (min-width: 750px) {
   .demo-logo {
-    width: 400px;
+    width: 200px;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    top: 100px;
+
   }
   .list-content {
     top: 300px;
