@@ -1,7 +1,6 @@
 "use client";
 import AnimationSkinningMorph from "@/components/animation-skinning-morph";
 import DreamGirl from "@/components/dream-girl";
-import Mum from "@/components/mum";
 import Richard from "@/components/richard";
 import { useSearchParams } from "next/navigation";
 
@@ -16,7 +15,6 @@ const ChatPage = (props: any) => {
         {cardType === "robot" && <AnimationSkinningMorph isShowList />}
         {cardType === "richard" && <Richard isShowList />}
         {cardType === "dream-girl" && <DreamGirl isShowList />}
-        {cardType === "mum" && <Mum isShowList />}
       </div>
     );
   }
@@ -25,7 +23,6 @@ const ChatPage = (props: any) => {
       {pageType === "robot" && <AnimationSkinningMorph />}
       {pageType === "richard" && <Richard />}
       {pageType === "dream-girl" && <DreamGirl />}
-      {pageType === "mum" && <Mum />}
     </>
   );
 };
